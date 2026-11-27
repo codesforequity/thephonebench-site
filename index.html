@@ -9,7 +9,7 @@
 <meta property="og:description" content="Take your time back. A physical card that puts you back in control of your time. Tap the Bench. Your apps go quiet. Your hours come back.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://thephonebench.com/">
-<meta property="og:image" content="https://thephonebench.com/assets/keeper-hero.webp">
+<meta property="og:image" content="https://thephonebench.com/assets/hero-v2.webp">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%235F7D6A'/%3E%3Ccircle cx='32' cy='32' r='11' fill='%23F6F5F2'/%3E%3C/svg%3E">
 <style>
   :root{
@@ -86,6 +86,12 @@
     font-size:16px;color:var(--ink);
   }
   .capture-done strong{font-weight:700}
+
+  /* hero product shot — one static image, the card is the hero object */
+  .hero-media{margin-top:42px;max-width:600px}
+  .hero-media img{
+    display:block;width:100%;height:auto;border-radius:24px;background:#101312;
+  }
 
   /* ---------- sections ---------- */
   section{padding:64px 0;border-top:1px solid var(--line)}
@@ -295,6 +301,15 @@
         <strong>You are on the list.</strong> One email when your Bench is ready. Nothing else.
       </div>
       <p class="capture-note" id="capture-note">First Benches go to the waitlist. No spam, no newsletter.</p>
+
+    <figure class="hero-media">
+      <img src="assets/hero-v2.webp"
+           srcset="assets/hero-v2-sm.webp 520w, assets/hero-v2.webp 1000w"
+           sizes="(max-width: 640px) 92vw, 600px"
+           width="1000" height="1250"
+           alt="The matte black Bench card, large and floating, above a dimmed iPhone whose screen has gone quiet"
+           fetchpriority="high" decoding="async">
+    </figure>
   </div>
 
   <!-- ============ THE MATH ============ -->
