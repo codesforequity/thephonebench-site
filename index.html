@@ -113,6 +113,27 @@
   .lifebar-caption{font-size:14px;color:var(--ink-2);max-width:44em}
   .lifebar-caption em{font-family:var(--serif)}
 
+  /* exact age counter */
+  .agebox{background:var(--raised);border-radius:20px;padding:28px 26px;margin-top:40px}
+  .agebox h3{font-size:22px;font-weight:700;letter-spacing:-0.01em;margin-bottom:8px}
+  .age-lede{font-size:15.5px;color:var(--ink-2);margin-bottom:20px;max-width:36em}
+  .age-row{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin-bottom:20px}
+  .age-row label{font-size:14px;font-weight:600;color:var(--ink-2)}
+  .age-row input{
+    font:inherit;font-size:16px;color:var(--ink);background:var(--bg);
+    border:1px solid var(--line);border-radius:14px;padding:11px 14px;
+  }
+  .age-row input:focus{outline:2px solid var(--sage);outline-offset:1px;border-color:transparent}
+  .age-hint{font-size:13px;color:var(--ink-3);flex-basis:100%}
+  .age-display{font-size:15px;color:var(--ink-2)}
+  .age-num{
+    display:block;font-family:var(--serif);font-weight:400;line-height:1.1;color:var(--ink);
+    font-size:clamp(30px,9vw,46px);letter-spacing:-0.01em;font-variant-numeric:tabular-nums;
+    margin-top:2px;
+  }
+  .age-pivot{font-size:15.5px;color:var(--ink-2);margin-top:16px;max-width:38em}
+  .age-pivot strong{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--clay)}
+
   /* how it works */
   .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:36px}
   .step{background:var(--raised);border-radius:20px;padding:26px 24px}
@@ -235,6 +256,21 @@
          aria-label="A bar of 80 blocks, one for each year of a life. 15 blocks are marked: the years an average phone takes."></div>
     <p class="lifebar-caption">One block is one year of a life. The marked blocks are the years the phone takes.
       <em>Benched gives them back a few hours at a time.</em></p>
+
+    <div class="agebox">
+      <h3>How old are you, exactly?</h3>
+      <p class="age-lede">Not rounded to your last birthday. Down to the fraction of a second, and still moving.</p>
+      <div class="age-row">
+        <label for="birthdate">Your birth date</label>
+        <input type="date" id="birthdate" name="birthdate" autocomplete="bday">
+        <span class="age-hint" id="age-hint">Showing an example — January 1, 2000. Enter yours above.</span>
+      </div>
+      <p class="age-display">You are
+        <span class="age-num" id="age-num">0.00000000000</span>
+        <span>years old</span>
+      </p>
+      <p class="age-pivot" id="age-pivot" hidden></p>
+    </div>
   </section>
 
   <!-- ============ HOW IT WORKS ============ -->
@@ -388,6 +424,55 @@
     form.hidden = true;
     note.hidden = true;
     done.hidden = false;
+  });
+
+  /* ---- Exact age counter ----
+     Age in years to 11 decimal places, recomputed every animation frame so
+     the last digits visibly race. All local arithmetic — no network calls.
+     With reduced motion, it updates once a second instead.
+     The pivot line: at 6h 41m a day, the phone takes about 15 of every 80
+     years, so the years gone so far ≈ age × 15/80 = age × 0.1875. */
+  var MS_YEAR = 365.2425 * 24 * 60 * 60 * 1000;
+  var ageInput = document.getElementById("birthdate");
+  var ageNum = document.getElementById("age-num");
+  var ageHint = document.getElementById("age-hint");
+  var agePivot = document.getElementById("age-pivot");
+  var birth = new Date(2000, 0, 1); /* placeholder example until a real date is entered */
+  var realDate = false;
+
+  function renderAge(){
+    var age = (Date.now() - birth.getTime()) / MS_YEAR;
+    if (age < 0) age = 0;
+    ageNum.textContent = age.toFixed(11);
+    if (realDate){
+      agePivot.innerHTML = "At 6h 41m a day, about <strong>" +
+        (age * 0.1875).toFixed(1) +
+        "</strong> of those years — gone to a phone, at the average pace.";
+    }
+  }
+  if (reduceMotion){
+    renderAge();
+    setInterval(renderAge, 1000);
+  } else {
+    (function tick(){
+      renderAge();
+      requestAnimationFrame(tick);
+    })();
+  }
+  ageInput.addEventListener("change", function(){
+    var v = ageInput.value;
+    if (!v) return;
+    var parts = v.split("-");
+    var d = new Date(+parts[0], +parts[1] - 1, +parts[2]);
+    if (isNaN(d.getTime()) || d.getTime() > Date.now()){
+      ageHint.textContent = "That date does not work — try your birth date.";
+      return;
+    }
+    birth = d;
+    realDate = true;
+    ageHint.textContent = "Your own number, live.";
+    agePivot.hidden = false;
+    renderAge();
   });
 })();
 </script>
