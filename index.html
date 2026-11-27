@@ -235,25 +235,25 @@
   <section aria-labelledby="math-h">
     <p class="eyebrow">The math</p>
     <h2 id="math-h">Your phone is taking years. Literally.</h2>
-    <p class="section-lede">The average person now spends 6 hours 41 minutes a day looking at a phone. Add it up and it stops sounding like a habit.</p>
+    <p class="section-lede">The average person now spends 6 hours a day looking at a phone. Add it up and it stops sounding like a habit.</p>
 
     <div class="math-grid">
       <div class="math-cell">
-        <div class="math-num">6h 41m</div>
+        <div class="math-num">6 hours</div>
         <p class="math-label">of screen time a day, on average</p>
       </div>
       <div class="math-cell">
-        <div class="math-num clay">1,000 days</div>
-        <p class="math-label">of your life gone in under 10 years at that pace</p>
+        <div class="math-num clay">91 days</div>
+        <p class="math-label">of your life gone every year at that pace</p>
       </div>
       <div class="math-cell">
-        <div class="math-num clay">&asymp;15 years</div>
-        <p class="math-label">across a lifetime, spent looking down</p>
+        <div class="math-num clay">20 years</div>
+        <p class="math-label">of an 80-year life spent looking down</p>
       </div>
     </div>
 
     <div class="lifebar" id="lifebar" role="img"
-         aria-label="A bar of 80 blocks, one for each year of a life. 15 blocks are marked: the years an average phone takes."></div>
+         aria-label="A bar of 80 blocks, one for each year of a life. 20 blocks are marked: the years an average phone takes."></div>
     <p class="lifebar-caption">One block is one year of a life. The marked blocks are the years the phone takes.
       <em>Benched gives them back a few hours at a time.</em></p>
 
@@ -361,7 +361,7 @@
   "use strict";
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  /* ---- Life bar: 80 years, 15 taken by the phone ---- */
+  /* ---- Life bar: 80 years, 20 taken by the phone ---- */
   var bar = document.getElementById("lifebar");
   var blocks = [];
   for (var i = 0; i < 80; i++){
@@ -369,7 +369,7 @@
     bar.appendChild(b);
     blocks.push(b);
   }
-  var LOST = 15;
+  var LOST = 20;
   function fillBar(){
     /* Mark the middle years — the phone takes them from the middle of life, not the end. */
     var start = 28;
@@ -430,8 +430,8 @@
      Age in years to 11 decimal places, recomputed every animation frame so
      the last digits visibly race. All local arithmetic — no network calls.
      With reduced motion, it updates once a second instead.
-     The pivot line: at 6h 41m a day, the phone takes about 15 of every 80
-     years, so the years gone so far ≈ age × 15/80 = age × 0.1875. */
+     The pivot line: at 6 hours a day, the phone takes 20 of every 80
+     years, so the years gone so far ≈ age × 20/80 = age × 0.25. */
   var MS_YEAR = 365.2425 * 24 * 60 * 60 * 1000;
   var ageInput = document.getElementById("birthdate");
   var ageNum = document.getElementById("age-num");
@@ -445,8 +445,8 @@
     if (age < 0) age = 0;
     ageNum.textContent = age.toFixed(11);
     if (realDate){
-      agePivot.innerHTML = "At 6h 41m a day, about <strong>" +
-        (age * 0.1875).toFixed(1) +
+      agePivot.innerHTML = "At 6 hours a day, about <strong>" +
+        (age * 0.25).toFixed(1) +
         "</strong> of those years — gone to a phone, at the average pace.";
     }
   }
