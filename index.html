@@ -88,11 +88,26 @@
   }
   .capture-done strong{font-weight:700}
 
-  /* hero product shot — one static image, the card is the hero object */
-  .hero-media{margin-top:42px;max-width:600px}
-  .hero-media img{
-    display:block;width:100%;height:auto;border-radius:24px;background:#101312;
+  /* hero product shot — one static image, the card is the hero object.
+     The teaching lives ON the frame: code-set type over the dark lower
+     third (never AI-rendered text) — the delta leads, the chain supports. */
+  .hero-media{margin-top:42px;max-width:600px;position:relative;border-radius:24px;overflow:hidden;background:#101312}
+  .hero-media img{display:block;width:100%;height:auto}
+  .hero-stats{
+    position:absolute;left:0;right:0;bottom:0;
+    padding:72px 26px 24px;
+    background:linear-gradient(to bottom,rgba(13,15,14,0) 0%,rgba(13,15,14,.52) 46%,rgba(13,15,14,.88) 100%);
+    color:#F6F5F2;
   }
+  .hero-stats .hs-before{
+    font-size:17px;font-weight:600;letter-spacing:.01em;color:rgba(246,245,242,.66);
+    text-decoration:line-through;text-decoration-thickness:2px;text-decoration-color:rgba(246,245,242,.6);
+  }
+  .hero-stats .hs-delta{
+    font-family:var(--serif);font-weight:400;letter-spacing:-.01em;
+    font-size:clamp(38px,11vw,54px);line-height:1.05;margin:2px 0 6px;
+  }
+  .hero-stats .hs-chain{font-size:13.5px;color:rgba(246,245,242,.88);letter-spacing:.02em}
 
   /* ---------- sections ---------- */
   section{padding:64px 0;border-top:1px solid var(--line)}
@@ -105,14 +120,13 @@
   .math-num{font-family:var(--serif);font-size:46px;line-height:1.05;font-weight:400;letter-spacing:-0.01em}
   .math-num.clay{color:var(--clay)}
   .math-label{font-size:15px;color:var(--ink-2);margin-top:8px}
-  .lifebar{display:grid;grid-template-columns:repeat(20,1fr);gap:5px;margin-bottom:14px}
-  .lifebar i{
-    display:block;aspect-ratio:1/1;border-radius:3px;background:var(--inset);
-    transition:background 300ms ease;
-  }
-  .lifebar i.lost{background:var(--clay)}
-  .lifebar-caption{font-size:14px;color:var(--ink-2);max-width:44em}
-  .lifebar-caption em{font-family:var(--serif)}
+  /* life in weeks — coded canvas grid: 80 rows x 52 weeks = 4,160 squares.
+     The last 1,040 (a full quarter) are clay: the phone's share. Weeks
+     already lived fill in ink once a birth date is entered. */
+  .weeks{max-width:600px;margin-bottom:16px}
+  .weeks canvas{display:block;width:100%}
+  .weeks-caption{font-size:14.5px;color:var(--ink-2);max-width:44em}
+  .weeks-caption em{font-family:var(--serif)}
 
   /* exact age counter */
   .agebox{background:var(--raised);border-radius:20px;padding:28px 26px;margin-top:40px}
@@ -135,8 +149,17 @@
   .age-pivot{font-size:15.5px;color:var(--ink-2);margin-top:16px;max-width:38em}
   .age-pivot strong{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--clay)}
 
-  /* screen time strip — coded UI, styled after a real iOS Screen Time report */
-  .st-strip{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:44px 0 14px}
+  /* screen time strip — coded UI, styled after a real iOS Screen Time report.
+     STRICT side-by-side at every width (Mitchell): two compressed columns
+     on mobile, never stacked. The delta sits above the pair. */
+  .st-delta{
+    margin:42px 0 0;text-align:center;font-size:16px;color:var(--ink-2);
+  }
+  .st-delta b{
+    font-family:var(--serif);font-weight:400;font-size:31px;letter-spacing:-.01em;
+    color:var(--sage);margin-right:6px;
+  }
+  .st-strip{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:16px 0 14px}
   .st-card{
     background:var(--raised);border:1px solid var(--line);border-radius:24px;
     padding:22px 22px 18px;box-shadow:0 10px 30px rgba(28,27,25,.06);
@@ -179,6 +202,10 @@
   .slider-track::-webkit-scrollbar{display:none}
   .slide{flex:0 0 86%;scroll-snap-align:start}
   .step{background:var(--raised);border-radius:20px;padding:26px 24px}
+  .step-img{
+    display:block;width:100%;height:auto;border-radius:14px;margin-bottom:18px;
+    background:var(--inset);
+  }
   .step-num{
     font-size:12px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;
     color:var(--sage);margin-bottom:12px;
@@ -246,13 +273,65 @@
     background:var(--sage-soft);border-radius:999px;padding:6px 14px;
   }
 
+  /* ---------- life-timer widget: small persistent pill, bottom-right.
+     The life timer's front door. Shares ONE birth date with the Math
+     counter (setBirth) — no duplicated state. The pill fades out when
+     the waitlist form or the How It Works controls reach its corner,
+     so it never covers the CTA, the email field, or the slider UI. */
+  .weeks{scroll-margin-top:20px}
+  .lt-widget{
+    position:fixed;right:16px;bottom:16px;z-index:60;
+    display:flex;flex-direction:column;align-items:flex-end;gap:10px;
+  }
+  .lt-pill{
+    display:inline-flex;align-items:center;gap:8px;min-height:44px;
+    font:inherit;font-size:14.5px;font-weight:600;color:var(--ink);
+    background:var(--raised);border:1px solid var(--line);border-radius:999px;
+    padding:10px 16px;box-shadow:0 8px 24px rgba(28,27,25,.14);cursor:pointer;
+    transition:opacity 200ms ease,transform 200ms ease;
+  }
+  .lt-pill:hover{border-color:var(--sage)}
+  .lt-pill .lt-cta{color:var(--sage);font-weight:700}
+  .lt-widget.is-clear .lt-pill{opacity:0;pointer-events:none;transform:translateY(8px)}
+  .lt-panel{
+    width:min(320px,calc(100vw - 32px));background:var(--raised);
+    border:1px solid var(--line);border-radius:20px;padding:20px;
+    box-shadow:0 18px 44px rgba(28,27,25,.18);
+  }
+  .lt-panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+  .lt-panel-title{font-family:var(--serif);font-size:20px;line-height:1.2}
+  .lt-close{
+    width:44px;height:44px;flex:0 0 auto;margin:-8px -8px 0 0;border:none;border-radius:50%;
+    background:transparent;color:var(--ink-2);font-size:24px;line-height:1;cursor:pointer;
+  }
+  .lt-close:hover{background:var(--inset);color:var(--ink)}
+  .lt-label{display:block;font-size:14px;font-weight:600;color:var(--ink-2);margin-bottom:8px}
+  .lt-panel input[type="date"]{
+    width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--bg);
+    border:1px solid var(--line);border-radius:14px;padding:11px 14px;min-height:44px;
+  }
+  .lt-panel input[type="date"]:focus{outline:2px solid var(--sage);outline-offset:1px;border-color:transparent}
+  .lt-hint{font-size:13px;color:var(--ink-2);margin-top:12px}
+  .lt-age-label{font-size:13px;color:var(--ink-2);margin-top:18px}
+  .lt-age{
+    font-family:var(--serif);font-size:27px;line-height:1.15;color:var(--ink);
+    font-variant-numeric:tabular-nums;
+  }
+  .lt-age .lt-age-unit{font-size:15px;color:var(--ink-2)}
+  .lt-weeks{font-size:15.5px;color:var(--ink);margin-top:10px}
+  .lt-share{font-size:14.5px;color:var(--ink-2);margin-top:6px}
+  .lt-see{
+    display:inline-flex;align-items:center;min-height:44px;margin-top:8px;
+    font-size:15.5px;font-weight:600;color:var(--sage);text-decoration:none;
+  }
+  .lt-see:hover{text-decoration:underline}
+
   /* ---------- responsive ---------- */
   @media (max-width:860px){
     .hero{padding:40px 0 44px}
     h1{font-size:40px}
     .math-grid{grid-template-columns:1fr}
     .safety{grid-template-columns:1fr 1fr}
-    .lifebar{grid-template-columns:repeat(10,1fr)}
     .payback{padding:28px 22px}
     .stat-cards{grid-template-columns:1fr}
     .stats-panel{padding:38px 20px 30px}
@@ -264,11 +343,25 @@
     .safety{grid-template-columns:1fr}
     .capture{flex-direction:column}
     .capture button{width:100%}
-    .st-strip{grid-template-columns:1fr}
+    /* Screen Time pair: still side-by-side — compressed columns, shrunk
+       bars/labels, nothing below the 12px type floor */
+    .st-strip{gap:10px}
+    .st-card{padding:14px 12px 12px;border-radius:18px}
+    .st-head{font-size:12.5px;margin-bottom:10px}
+    .st-avg{font-size:23px;margin-bottom:12px}
+    .st-avg-label{font-size:12px}
+    .st-bars{height:52px;gap:3px;margin-bottom:5px}
+    .st-days{gap:3px;margin-bottom:10px}
+    .st-rows p{font-size:12.5px;padding:6px 0}
+    .st-delta{font-size:15px}
+    .st-delta b{font-size:27px}
+    /* hero stat overlay at phone size */
+    .hero-stats{padding:56px 18px 18px}
+    .hero-stats .hs-before{font-size:15.5px}
+    .hero-stats .hs-chain{font-size:12.5px}
   }
   @media (prefers-reduced-motion:reduce){
     html{scroll-behavior:auto}
-    .lifebar i{transition:none}
   }
 </style>
 </head>
@@ -310,6 +403,11 @@
            width="1000" height="1250"
            alt="The matte black Bench card, large and floating, above a dimmed iPhone whose screen has gone quiet"
            fetchpriority="high" decoding="async">
+      <figcaption class="hero-stats">
+        <p class="hs-before">6 hours a day</p>
+        <p class="hs-delta">3 hours back.</p>
+        <p class="hs-chain">91 days a year &middot; 20 years of a life</p>
+      </figcaption>
     </figure>
   </div>
 
@@ -334,11 +432,13 @@
       </div>
     </div>
 
-    <div class="lifebar" id="lifebar" role="img"
-         aria-label="A bar of 80 blocks, one for each year of a life. 20 blocks are marked: the years an average phone takes."></div>
-    <p class="lifebar-caption">One block is one year of a life. The marked blocks are the years the phone takes.
-      <em>Benched gives them back a few hours at a time.</em></p>
+    <div class="weeks" id="life-in-weeks">
+      <canvas id="weeksgrid" width="600" height="920" role="img"
+              aria-label="A grid of 4,160 small squares — one for every week of an 80-year life. The last 1,040 squares, a full quarter of the grid, are shaded clay: the weeks a phone takes at 6 hours a day."></canvas>
+    </div>
+    <p class="weeks-caption">Your life in weeks. The phone takes about 1,040 of them — the clay quarter. <em>Every other square is yours to keep.</em><span id="weeks-note"></span></p>
 
+    <p class="st-delta"><b>&minus;3 hours</b> of screen time a day</p>
     <div class="st-strip">
       <div class="st-card" role="img" aria-label="A Screen Time report before Benched: daily average 6 hours, tall daily bars, led by Social at 2 hours 41 minutes.">
         <p class="st-head"><span>Screen Time</span><span class="st-when">Before</span></p>
@@ -354,8 +454,8 @@
           <p><span>Games</span><b>52m</b></p>
         </div>
       </div>
-      <div class="st-card after" role="img" aria-label="A Screen Time report with Benched: daily average 3 hours, low daily bars, Social down to 58 minutes.">
-        <p class="st-head"><span>Screen Time</span><span class="st-when">With Benched</span></p>
+      <div class="st-card after" role="img" aria-label="A Screen Time report after Benched: daily average 3 hours, low daily bars, Social down to 58 minutes.">
+        <p class="st-head"><span>Screen Time</span><span class="st-when">After</span></p>
         <p class="st-avg-label">Daily Average</p>
         <p class="st-avg">3h 00m</p>
         <div class="st-bars" aria-hidden="true">
@@ -369,7 +469,7 @@
         </div>
       </div>
     </div>
-    <p class="st-caption">The same phone, the same week — the second report is what a Bench on the fridge does to it. <em>Your Screen Time report already knows your number.</em></p>
+    <p class="st-caption">The same phone, the same week — the report on the right is what a Bench on the fridge does to it. <em>Your Screen Time report already knows your number.</em></p>
 
     <div class="agebox">
       <h3>How old are you, exactly?</h3>
@@ -403,16 +503,22 @@
 
     <div class="slider-track" id="steps-track">
       <div class="step slide">
+        <img class="step-img" src="assets/step1-tap.webp" width="840" height="560" loading="lazy" decoding="async"
+             alt="A hand holding a phone up to the black Bench card on a fridge — the tap">
         <p class="step-num">Step one</p>
         <h3>Tap to start</h3>
         <p>Start a session from anywhere. The apps you picked go quiet behind the Mirror — a calm shield that shows your note to yourself, your streak, and nothing else.</p>
       </div>
       <div class="step slide">
+        <img class="step-img" src="assets/step2-benched.webp" width="840" height="560" loading="lazy" decoding="async"
+             alt="A phone standing quiet on a desk, its screen showing the Mirror shield: You've been Benched, 2 hours 45 minutes, Stay Benched">
         <p class="step-num">Step two</p>
         <h3>Stay Benched</h3>
         <p>There is a way out early — break glass — but it is deliberately slow, and every break costs the Bench a crack. Five cracks retire it. Most days, staying is easier.</p>
       </div>
       <div class="step slide">
+        <img class="step-img" src="assets/step3-back.webp" width="840" height="560" loading="lazy" decoding="async"
+             alt="The Keeper resting on a couch in warm light, jars of kept hours glowing on the shelf behind">
         <p class="step-num">Step three</p>
         <h3>Tap to end</h3>
         <p>Sessions end at a Bench, and only at a Bench. Walk to it, tap, and everything comes back. The hours you kept are counted — in hours and days, not points.</p>
@@ -502,46 +608,88 @@
 
 </div>
 
+<!-- ============ LIFE TIMER WIDGET ============ -->
+<div class="lt-widget" id="lt-widget">
+  <div class="lt-panel" id="lt-panel" hidden role="dialog" aria-label="Your life timer">
+    <div class="lt-panel-head">
+      <p class="lt-panel-title">Your life, flying by</p>
+      <button class="lt-close" id="lt-close" type="button" aria-label="Close the life timer">&times;</button>
+    </div>
+    <label class="lt-label" for="lt-birthdate">Your birth date</label>
+    <input type="date" id="lt-birthdate" autocomplete="bday">
+    <div id="lt-live" hidden>
+      <p class="lt-age-label">You are</p>
+      <p class="lt-age"><span id="lt-age-num">0.00000000000</span> <span class="lt-age-unit">years old</span></p>
+      <p class="lt-weeks"><strong id="lt-weeks-num">0</strong> weeks lived so far</p>
+      <p class="lt-share">At 6 hours a day, &asymp;1,040 of your weeks go to the phone.</p>
+      <a class="lt-see" id="lt-see" href="#life-in-weeks">See your life in weeks &darr;</a>
+    </div>
+    <p class="lt-hint" id="lt-hint">Enter your birth date — your age starts ticking, live, and the weeks grid in The Math fills in with your life.</p>
+  </div>
+  <button class="lt-pill" id="lt-pill" type="button" aria-expanded="false" aria-controls="lt-panel">
+    <span aria-hidden="true">&#9203;</span> Your life, flying by <span class="lt-cta">Calculate</span>
+  </button>
+</div>
+
 <script>
 (function(){
   "use strict";
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  /* ---- Life bar: 80 years, 20 taken by the phone ---- */
-  var bar = document.getElementById("lifebar");
-  var blocks = [];
-  for (var i = 0; i < 80; i++){
-    var b = document.createElement("i");
-    bar.appendChild(b);
-    blocks.push(b);
-  }
-  var LOST = 20;
-  function fillBar(){
-    /* Mark the middle years — the phone takes them from the middle of life, not the end. */
-    var start = 28;
-    for (var j = 0; j < LOST; j++){
-      (function(block, delay){
-        if (reduceMotion || !delay){ block.classList.add("lost"); }
-        else { setTimeout(function(){ block.classList.add("lost"); }, delay); }
-      })(blocks[start + j], j * 60);
+  /* ---- Life in weeks: 80 rows x 52 weeks = 4,160 squares, drawn on a
+     canvas (one element, no DOM weight). The last 1,040 squares — a full
+     quarter — are clay: the phone's share at 6 hours a day. When a birth
+     date is entered, the weeks already lived fill in ink; renderAge
+     drives that via setLivedWeeks. ---- */
+  var WEEKS_ROWS = 80, WEEKS_COLS = 52;
+  var WEEKS_TOTAL = WEEKS_ROWS * WEEKS_COLS;  /* 4,160 */
+  var WEEKS_PHONE = 1040;                    /* 20 years, in weeks */
+  var weeksCanvas = document.getElementById("weeksgrid");
+  var weeksNote = document.getElementById("weeks-note");
+  var livedWeeks = 0;
+
+  function drawWeeks(){
+    if (!weeksCanvas || !weeksCanvas.getContext) return;
+    var w = weeksCanvas.clientWidth;
+    if (!w) return;
+    var dpr = window.devicePixelRatio || 1;
+    var gap = w < 420 ? 1 : 2;
+    var cell = (w - (WEEKS_COLS - 1) * gap) / WEEKS_COLS;
+    var h = WEEKS_ROWS * cell + (WEEKS_ROWS - 1) * gap;
+    weeksCanvas.width = Math.round(w * dpr);
+    weeksCanvas.height = Math.round(h * dpr);
+    weeksCanvas.style.height = h + "px";
+    var ctx = weeksCanvas.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var step = cell + gap;
+    for (var i = 0; i < WEEKS_TOTAL; i++){
+      var r = Math.floor(i / WEEKS_COLS), c = i % WEEKS_COLS;
+      ctx.fillStyle = i >= WEEKS_TOTAL - WEEKS_PHONE ? "#A4553F" : "#E4E8E1";
+      if (i < livedWeeks) ctx.fillStyle = "#1C1B19";
+      ctx.fillRect(c * step, r * step, cell, cell);
     }
   }
-
-  /* ---- Life bar fills when it scrolls into view.
-     The tap video is user-driven (native controls) — nothing on this page autoplays. ---- */
-  if ("IntersectionObserver" in window){
-    var barSeen = false;
-    var io = new IntersectionObserver(function(entries){
-      entries.forEach(function(e){
-        if (e.target === bar && e.isIntersecting && !barSeen){
-          barSeen = true; fillBar();
-        }
-      });
-    }, { threshold: 0.35 });
-    io.observe(bar);
-  } else {
-    fillBar();
+  function setLivedWeeks(wk){
+    if (wk === livedWeeks) return;
+    livedWeeks = wk;
+    drawWeeks();
+    if (weeksNote){
+      weeksNote.textContent = " You have lived " + wk.toLocaleString("en-US") +
+        " of them — the dark squares. The clay is what the phone still stands to take.";
+    }
+    if (weeksCanvas){
+      weeksCanvas.setAttribute("aria-label",
+        "A grid of 4,160 small squares — one for every week of an 80-year life. " +
+        wk.toLocaleString("en-US") + " squares are dark: the weeks you have lived. " +
+        "The last 1,040 squares are clay: the weeks a phone takes at 6 hours a day.");
+    }
   }
+  drawWeeks();
+  var weeksResizeT = null;
+  window.addEventListener("resize", function(){
+    if (weeksResizeT) return;
+    weeksResizeT = setTimeout(function(){ weeksResizeT = null; drawWeeks(); }, 150);
+  });
 
   /* ---- How It Works slide-through: arrows + dots drive the track.
      The track itself is natively swipeable (scroll-snap); this only syncs UI. ---- */
@@ -616,7 +764,9 @@
       agePivot.innerHTML = "At 6 hours a day, about <strong>" +
         (age * 0.25).toFixed(1) +
         "</strong> of those years — gone to a phone, at the average pace.";
+      setLivedWeeks(Math.min(WEEKS_TOTAL, Math.floor(age * WEEKS_COLS)));
     }
+    syncLifeWidget(age);
   }
   if (reduceMotion){
     renderAge();
@@ -627,21 +777,114 @@
       requestAnimationFrame(tick);
     })();
   }
-  ageInput.addEventListener("change", function(){
-    var v = ageInput.value;
-    if (!v) return;
-    var parts = v.split("-");
-    var d = new Date(+parts[0], +parts[1] - 1, +parts[2]);
-    if (isNaN(d.getTime()) || d.getTime() > Date.now()){
-      ageHint.textContent = "That date does not work — try your birth date.";
-      return;
-    }
+  /* One birth date drives everything: the Math counter, the weeks grid,
+     and the life-timer widget. setBirth is the only writer. */
+  function setBirth(d){
     birth = d;
     realDate = true;
+    var v = d.getFullYear() + "-" +
+      ("0" + (d.getMonth() + 1)).slice(-2) + "-" +
+      ("0" + d.getDate()).slice(-2);
+    if (ageInput.value !== v) ageInput.value = v;
+    if (ltInput && ltInput.value !== v) ltInput.value = v;
     ageHint.textContent = "Your own number, live.";
+    if (ltHint) ltHint.textContent = "Same date as the counter in The Math — one birthday drives both.";
     agePivot.hidden = false;
+    if (ltLive) ltLive.hidden = false;
     renderAge();
+  }
+  function parseBirthInput(input){
+    var v = input.value;
+    if (!v) return null;
+    var parts = v.split("-");
+    var d = new Date(+parts[0], +parts[1] - 1, +parts[2]);
+    if (isNaN(d.getTime()) || d.getTime() > Date.now()) return null;
+    return d;
+  }
+  ageInput.addEventListener("change", function(){
+    var d = parseBirthInput(ageInput);
+    if (!d){
+      if (ageInput.value) ageHint.textContent = "That date does not work — try your birth date.";
+      return;
+    }
+    setBirth(d);
   });
+
+  /* ---- Life-timer widget ----
+     The pill is the life timer's front door. It shares the ONE birth
+     date with the Math counter: setBirth writes both inputs, and
+     renderAge calls syncLifeWidget on every tick. State lives in the
+     page session only — nothing is stored or sent anywhere. */
+  var ltWidget = document.getElementById("lt-widget");
+  var ltPill = document.getElementById("lt-pill");
+  var ltPanel = document.getElementById("lt-panel");
+  var ltClose = document.getElementById("lt-close");
+  var ltInput = document.getElementById("lt-birthdate");
+  var ltLive = document.getElementById("lt-live");
+  var ltHint = document.getElementById("lt-hint");
+  var ltAgeNum = document.getElementById("lt-age-num");
+  var ltWeeksNum = document.getElementById("lt-weeks-num");
+  var ltSee = document.getElementById("lt-see");
+
+  function syncLifeWidget(age){
+    if (!ltAgeNum || !realDate) return;
+    ltAgeNum.textContent = age.toFixed(11);
+    if (ltWeeksNum) ltWeeksNum.textContent = livedWeeks.toLocaleString("en-US");
+  }
+  function openPanel(){
+    ltPanel.hidden = false;
+    ltPill.hidden = true;
+    ltPill.setAttribute("aria-expanded", "true");
+    ltWidget.classList.remove("is-clear");
+    if (ltInput) ltInput.focus({ preventScroll: true });
+  }
+  function closePanel(){
+    ltPanel.hidden = true;
+    ltPill.hidden = false;
+    ltPill.setAttribute("aria-expanded", "false");
+    ltGuard();
+  }
+  ltPill.addEventListener("click", openPanel);
+  ltClose.addEventListener("click", function(){ closePanel(); ltPill.focus({ preventScroll: true }); });
+  ltInput.addEventListener("change", function(){
+    var d = parseBirthInput(ltInput);
+    if (!d){
+      if (ltInput.value) ltHint.textContent = "That date does not work — try your birth date.";
+      return;
+    }
+    setBirth(d);
+  });
+  ltSee.addEventListener("click", function(){ closePanel(); });
+  document.addEventListener("keydown", function(ev){
+    if (ev.key === "Escape" && ltPanel && !ltPanel.hidden) closePanel();
+  });
+
+  /* Keep the pill out of the way of the page's own controls: when the
+     waitlist form or the How It Works slider UI scrolls into the
+     pill's corner zone, the pill fades until they pass. */
+  var ltGuardEls = [document.getElementById("waitlist"),
+                    document.querySelector(".slider-ui")];
+  var ltGuardTick = false;
+  function ltGuard(){
+    ltGuardTick = false;
+    if (!ltPanel || !ltPanel.hidden) return;
+    var zoneTop = window.innerHeight - 84;
+    var zoneLeft = window.innerWidth - 264;
+    var clear = true;
+    ltGuardEls.forEach(function(el){
+      if (!el) return;
+      var r = el.getBoundingClientRect();
+      if (r.bottom > zoneTop && r.right > zoneLeft && r.top < window.innerHeight) clear = false;
+    });
+    ltWidget.classList.toggle("is-clear", !clear);
+  }
+  window.addEventListener("scroll", function(){
+    if (ltGuardTick) return;
+    ltGuardTick = true;
+    window.requestAnimationFrame(ltGuard);
+  }, { passive: true });
+  window.addEventListener("resize", ltGuard);
+  ltGuard();
 
 })();
 </script>
