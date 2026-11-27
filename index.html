@@ -122,10 +122,13 @@
   .math-label{font-size:15px;color:var(--ink-2);margin-top:8px}
   /* life in weeks — coded canvas grid: 80 rows x 52 weeks = 4,160 squares.
      The last 1,040 (a full quarter) are clay: the phone's share. Weeks
-     already lived fill in ink once a birth date is entered. */
-  .weeks{max-width:600px;margin-bottom:16px}
+     already lived fill in ink once a birth date is entered.
+     Shrunk Nov 27 (Mitchell: "way too big"): the field sits in a centered
+     400px column and drawWeeks renders cells shorter than wide, so the
+     block stands about half its old height while the quarter still reads. */
+  .weeks{max-width:400px;margin:0 auto 10px}
   .weeks canvas{display:block;width:100%}
-  .weeks-caption{font-size:14.5px;color:var(--ink-2);max-width:44em}
+  .weeks-caption{font-size:14.5px;color:var(--ink-2);max-width:400px;margin:0 auto;text-align:center}
   .weeks-caption em{font-family:var(--serif)}
 
   /* exact age counter */
@@ -433,7 +436,7 @@
     </div>
 
     <div class="weeks" id="life-in-weeks">
-      <canvas id="weeksgrid" width="600" height="920" role="img"
+      <canvas id="weeksgrid" width="600" height="450" role="img"
               aria-label="A grid of 4,160 small squares — one for every week of an 80-year life. The last 1,040 squares, a full quarter of the grid, are shaded clay: the weeks a phone takes at 6 hours a day."></canvas>
     </div>
     <p class="weeks-caption">Your life in weeks. The phone takes about 1,040 of them — the clay quarter. <em>Every other square is yours to keep.</em><span id="weeks-note"></span></p>
@@ -653,20 +656,24 @@
     var w = weeksCanvas.clientWidth;
     if (!w) return;
     var dpr = window.devicePixelRatio || 1;
-    var gap = w < 420 ? 1 : 2;
-    var cell = (w - (WEEKS_COLS - 1) * gap) / WEEKS_COLS;
-    var h = WEEKS_ROWS * cell + (WEEKS_ROWS - 1) * gap;
+    var gapX = w < 420 ? 1 : 2;
+    var gapY = window.innerWidth <= 860 ? 0.5 : 1;
+    var cellW = (w - (WEEKS_COLS - 1) * gapX) / WEEKS_COLS;
+    /* Cells render shorter than wide (squash) so the field stands about
+       half its old height; all 4,160 weeks and the clay quarter remain. */
+    var cellH = cellW * (window.innerWidth <= 860 ? 0.42 : 0.68);
+    var h = WEEKS_ROWS * cellH + (WEEKS_ROWS - 1) * gapY;
     weeksCanvas.width = Math.round(w * dpr);
     weeksCanvas.height = Math.round(h * dpr);
     weeksCanvas.style.height = h + "px";
     var ctx = weeksCanvas.getContext("2d");
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    var step = cell + gap;
+    var stepX = cellW + gapX, stepY = cellH + gapY;
     for (var i = 0; i < WEEKS_TOTAL; i++){
       var r = Math.floor(i / WEEKS_COLS), c = i % WEEKS_COLS;
       ctx.fillStyle = i >= WEEKS_TOTAL - WEEKS_PHONE ? "#A4553F" : "#E4E8E1";
       if (i < livedWeeks) ctx.fillStyle = "#1C1B19";
-      ctx.fillRect(c * step, r * step, cell, cell);
+      ctx.fillRect(c * stepX, r * stepY, cellW, cellH);
     }
   }
   function setLivedWeeks(wk){
